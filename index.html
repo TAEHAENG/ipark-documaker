@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>아이파크 부동산 문서생성기</title>
   <link rel="stylesheet" href="style.css">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#059669">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="문서생성기">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 </head>
 <body>
 <div id="app">
@@ -22,7 +30,7 @@
         <select id="subgroupSelect" onchange="onSubgroupChange()"></select>
       </div>
       <div class="selector-row">
-        <button class="btn-edit-mode" id="editModeBtn">&#9998; 템플릿 편집</button>
+        <button class="btn-edit-mode" id="editModeBtn">&#9998; 삽입자 편집</button>
         <button class="btn-secondary btn-sm" id="editBodyBtn">&#128196; 본문 편집</button>
       </div>
     </div>
@@ -41,6 +49,7 @@
         <table class="placeholder-table">
           <thead>
             <tr>
+              <th class="col-drag"></th>
               <th class="col-tag">삽입자</th>
               <th class="col-desc">설명</th>
               <th class="col-type">유형</th>
@@ -98,6 +107,32 @@
 
   <!-- 동기화 상태 표시 -->
   <div class="sync-badge hidden" id="syncBadge"></div>
+
+  <!-- ===== 삽입자 라이브러리 ===== -->
+  <section class="library-section">
+    <div class="section-header">
+      <h2>삽입자 라이브러리</h2>
+      <div class="library-header-btns">
+        <button class="btn-secondary btn-sm" onclick="selectAllLibrary(true)">전체 선택</button>
+        <button class="btn-secondary btn-sm" onclick="selectAllLibrary(false)">전체 해제</button>
+        <button class="btn-primary btn-sm" onclick="addLibraryItems()">&#10133; 선택항목 현재 템플릿에 추가</button>
+      </div>
+    </div>
+    <div class="table-wrapper">
+      <table class="library-table">
+        <thead>
+          <tr>
+            <th class="col-check">선택</th>
+            <th>분류</th>
+            <th>설명</th>
+            <th>유형</th>
+            <th>수식 (자동계산)</th>
+          </tr>
+        </thead>
+        <tbody id="libraryBody"></tbody>
+      </table>
+    </div>
+  </section>
 
 </div>
 

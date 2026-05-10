@@ -447,6 +447,48 @@ const DEFAULT_DATA = {
 };
 
 // ============================================================
+// 삽입자 라이브러리 (공통 샘플)
+// ============================================================
+
+const PLACEHOLDER_LIBRARY = [
+  // 부동산
+  { category: '부동산',    description: '물건지 주소',                   type: 'text',       formulaTemplate: '' },
+  // 매매 금액
+  { category: '매매금액',  description: '매매대금(만단위)',               type: 'amount_man', formulaTemplate: '' },
+  { category: '매매금액',  description: '계약금(만단위)',                 type: 'amount_man', formulaTemplate: '' },
+  { category: '매매금액',  description: '중도금(만단위)',                 type: 'amount_man', formulaTemplate: '' },
+  { category: '매매금액',  description: '잔금 = 매매대금-계약금-중도금', type: 'formula',    formulaTemplate: '[매매대금(만단위)]-[계약금(만단위)]-[중도금(만단위)]' },
+  // 전세 금액
+  { category: '전세금액',  description: '전세보증금(만단위)',             type: 'amount_man', formulaTemplate: '' },
+  { category: '전세금액',  description: '잔금 = 전세보증금-계약금',      type: 'formula',    formulaTemplate: '[전세보증금(만단위)]-[계약금(만단위)]' },
+  // 월세 금액
+  { category: '월세금액',  description: '보증금(만단위)',                 type: 'amount_man', formulaTemplate: '' },
+  { category: '월세금액',  description: '월세(만단위)',                   type: 'amount_man', formulaTemplate: '' },
+  { category: '월세금액',  description: '잔금 = 보증금-계약금',          type: 'formula',    formulaTemplate: '[보증금(만단위)]-[계약금(만단위)]' },
+  // 날짜
+  { category: '날짜',      description: '계약금 입금일',                  type: 'text',       formulaTemplate: '' },
+  { category: '날짜',      description: '중도금일',                       type: 'text',       formulaTemplate: '' },
+  { category: '날짜',      description: '잔금일',                         type: 'text',       formulaTemplate: '' },
+  { category: '날짜',      description: '임대차 기간',                    type: 'text',       formulaTemplate: '' },
+  { category: '날짜',      description: '월세 납부일(일)',                type: 'text',       formulaTemplate: '' },
+  { category: '날짜',      description: '계약서 작성일',                  type: 'text',       formulaTemplate: '' },
+  { category: '날짜',      description: '안내일자',                       type: 'text',       formulaTemplate: '' },
+  // 기타
+  { category: '기타',      description: '특약사항',                       type: 'text',       formulaTemplate: '' },
+  { category: '임차인',    description: '임차인 성명',                    type: 'text',       formulaTemplate: '' },
+  { category: '임차인',    description: '세대 주소',                      type: 'text',       formulaTemplate: '' },
+  { category: '임차인',    description: '입주 예정일',                    type: 'text',       formulaTemplate: '' },
+];
+
+function resolveFormulaTemplate(tmpl, allPhs) {
+  // [설명] → {index} 로 치환. 못 찾으면 {?} 표시
+  return tmpl.replace(/\[([^\]]+)\]/g, (_, desc) => {
+    const ph = allPhs.find(p => p.description === desc);
+    return ph ? `{${ph.index}}` : '{?}';
+  });
+}
+
+// ============================================================
 // 앱 상태
 // ============================================================
 
@@ -456,6 +498,9 @@ let currentSubgroupId = null;
 let currentTemplateId = null;
 let editMode          = false;
 let bodyEditing       = false;
+
+// 드래그 상태
+let _dragSrcPos = null;
 
 // ============================================================
 // Firebase 동기화
@@ -701,7 +746,7 @@ function renderTable() {
   const phs = tmpl.placeholders;
   const typeLabel = { text: '텍스트', amount_man: '금액(만)', date: '날짜', formula: '수식' };
 
-  const rows = phs.map(ph => {
+  const rows = phs.map((ph, pos) => {
     const note = getNoteText(ph, phs);
 
     // 입력 셀
@@ -739,7 +784,12 @@ function renderTable() {
       : '';
 
     return `
-      <tr>
+      <tr draggable="true"
+          ondragstart="onDragStart(event,${pos})"
+          ondragover="onDragOver(event,${pos})"
+          ondrop="onDrop(event,${pos})"
+          ondragend="onDragEnd(event)">
+        <td class="col-drag"><span class="drag-handle" title="드래그하여 순서 변경">⠿</span></td>
         <td><span class="placeholder-tag">{${ph.index}}</span></td>
         <td>${descCell}</td>
         <td>${typeCell}</td>
@@ -816,8 +866,7 @@ function updateValue(index, value) {
   if (!ph) return;
   ph.value = value;
   saveData();
-  // 비고 셀만 빠르게 업데이트
-  updateNoteCellDOM(index);
+  updateAllNoteCells(); // 수식 삽입자 포함 전체 비고 갱신
   renderPreview();
 }
 
@@ -844,8 +893,14 @@ function updateFormulaExpr(index, value) {
   if (!ph) return;
   ph.formulaExpr = value;
   saveData();
-  updateNoteCellDOM(index);
+  updateAllNoteCells(); // 수식 변경 시 전체 비고 갱신
   renderPreview();
+}
+
+function updateAllNoteCells() {
+  const tmpl = getCurrentTemplate();
+  if (!tmpl) return;
+  tmpl.placeholders.forEach(ph => updateNoteCellDOM(ph.index));
 }
 
 function updateNoteCellDOM(index) {
@@ -869,8 +924,81 @@ function updateNoteCellDOM(index) {
 function toggleEditMode() {
   editMode = !editMode;
   const btn = document.getElementById('editModeBtn');
-  btn.textContent = editMode ? '✅ 편집 완료' : '✏ 템플릿 편집';
+  btn.textContent = editMode ? '✅ 편집 완료' : '✏ 삽입자 편집';
   btn.classList.toggle('active', editMode);
+  renderAll();
+}
+
+// ============================================================
+// 드래그 앤 드롭 순서 변경
+// ============================================================
+
+function onDragStart(e, pos) {
+  _dragSrcPos = pos;
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+}
+
+function onDragOver(e, pos) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  // 현재 hover 행만 강조
+  document.querySelectorAll('#placeholderBody tr').forEach((tr, i) => {
+    tr.classList.toggle('drag-over', i === pos && i !== _dragSrcPos);
+  });
+}
+
+function onDrop(e, tgtPos) {
+  e.preventDefault();
+  document.querySelectorAll('#placeholderBody tr').forEach(tr => tr.classList.remove('drag-over'));
+  if (_dragSrcPos === null || _dragSrcPos === tgtPos) { _dragSrcPos = null; return; }
+  reorderPlaceholders(_dragSrcPos, tgtPos);
+  _dragSrcPos = null;
+}
+
+function onDragEnd(e) {
+  e.currentTarget.classList.remove('dragging');
+  document.querySelectorAll('#placeholderBody tr').forEach(tr => tr.classList.remove('drag-over'));
+  _dragSrcPos = null;
+}
+
+function reorderPlaceholders(srcPos, tgtPos) {
+  const tmpl = getCurrentTemplate();
+  if (!tmpl) return;
+  const phs = tmpl.placeholders;
+
+  // 이동 후 각 placeholder 의 new index 를 미리 계산 (old_index → new_index 매핑)
+  const newIndexMap = {};
+  phs.forEach((ph, i) => {
+    let newPos;
+    if (i === srcPos) {
+      newPos = tgtPos;
+    } else if (srcPos < tgtPos) {
+      newPos = (i > srcPos && i <= tgtPos) ? i - 1 : i;
+    } else {
+      newPos = (i >= tgtPos && i < srcPos) ? i + 1 : i;
+    }
+    newIndexMap[ph.index] = newPos + 1;
+  });
+
+  // 수식 삽입자의 {N} 참조를 새 번호로 갱신
+  phs.forEach(ph => {
+    if (ph.type === 'formula' && ph.formulaExpr) {
+      ph.formulaExpr = ph.formulaExpr.replace(/\{(\d+)\}/g, (_, n) => {
+        const ni = newIndexMap[parseInt(n, 10)];
+        return `{${ni ?? n}}`;
+      });
+    }
+  });
+
+  // 배열 이동
+  const [moved] = phs.splice(srcPos, 1);
+  phs.splice(tgtPos, 0, moved);
+
+  // 인덱스 재부여 1, 2, 3...
+  phs.forEach((ph, i) => { ph.index = i + 1; });
+
+  saveData();
   renderAll();
 }
 
@@ -1054,6 +1182,74 @@ function resetData() {
 }
 
 // ============================================================
+// 삽입자 라이브러리 UI
+// ============================================================
+
+function renderLibrary() {
+  const tbody = document.getElementById('libraryBody');
+  if (!tbody) return;
+  const typeLabel = { text: '텍스트', amount_man: '금액(만)', date: '날짜', formula: '수식' };
+
+  tbody.innerHTML = PLACEHOLDER_LIBRARY.map((item, i) => `
+    <tr>
+      <td class="col-check">
+        <input type="checkbox" class="lib-check" data-lib="${i}"
+               onchange="this.closest('tr').classList.toggle('lib-selected', this.checked)">
+      </td>
+      <td><span class="lib-cat-badge">${esc(item.category)}</span></td>
+      <td>${esc(item.description)}</td>
+      <td><span class="type-badge type-${item.type}">${typeLabel[item.type]}</span></td>
+      <td>${item.formulaTemplate
+            ? `<span class="lib-formula-hint">${esc(item.formulaTemplate)}</span>`
+            : '<span style="color:#d1d5db">—</span>'}</td>
+    </tr>`).join('');
+}
+
+function selectAllLibrary(checked) {
+  document.querySelectorAll('.lib-check').forEach(cb => {
+    cb.checked = checked;
+    cb.closest('tr').classList.toggle('lib-selected', checked);
+  });
+}
+
+function addLibraryItems() {
+  const tmpl = getCurrentTemplate();
+  if (!tmpl) { showToast('먼저 템플릿을 선택하세요.', 2000, 'error'); return; }
+
+  const checked = Array.from(document.querySelectorAll('.lib-check:checked'));
+  if (checked.length === 0) { showToast('추가할 항목을 선택하세요.', 2000, 'error'); return; }
+
+  const selected = checked.map(cb => PLACEHOLDER_LIBRARY[parseInt(cb.dataset.lib, 10)]);
+  const maxIdx   = Math.max(0, ...tmpl.placeholders.map(p => p.index));
+
+  // 1차: 인덱스 먼저 할당
+  const newPhs = selected.map((item, i) => ({
+    index: maxIdx + i + 1,
+    description: item.description,
+    type: item.type,
+    value: '',
+    formulaExpr: ''
+  }));
+
+  // 2차: 수식 템플릿 해석 (기존 + 새 삽입자 통합해서 참조)
+  const allPhs = [...tmpl.placeholders, ...newPhs];
+  newPhs.forEach((ph, i) => {
+    if (selected[i].formulaTemplate) {
+      ph.formulaExpr = resolveFormulaTemplate(selected[i].formulaTemplate, allPhs);
+    }
+  });
+
+  tmpl.placeholders.push(...newPhs);
+
+  // 선택 해제
+  selectAllLibrary(false);
+
+  saveData();
+  renderAll();
+  showToast(`${newPhs.length}개 삽입자가 추가되었습니다.`);
+}
+
+// ============================================================
 // 토스트 알림
 // ============================================================
 
@@ -1091,6 +1287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderGroupSelector();
   renderAll();
+  renderLibrary();
 
   // Firebase 실시간 동기화 시작 (다른 기기 변경 자동 반영)
   setupRealtimeSync();
