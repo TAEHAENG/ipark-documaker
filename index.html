@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아이파크 부동산 문서생성기</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== 헤더 ===== -->
+  <header class="app-header">
+    <div class="header-title">
+      <h1>아이파크 부동산 문서생성기</h1>
+      <p class="subtitle">위례아이파크 공인중개사사무소 &nbsp;02-402-4600</p>
+    </div>
+    <div class="template-selector">
+      <div class="selector-row">
+        <label class="sel-label">분류</label>
+        <select id="groupSelect" onchange="onGroupChange()"></select>
+        <select id="subgroupSelect" onchange="onSubgroupChange()"></select>
+      </div>
+      <div class="selector-row">
+        <button class="btn-edit-mode" id="editModeBtn">&#9998; 템플릿 편집</button>
+        <button class="btn-secondary btn-sm" id="editBodyBtn">&#128196; 본문 편집</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== 메인 ===== -->
+  <main class="app-main">
+
+    <!-- 입력 테이블 -->
+    <section class="input-section">
+      <div class="section-header">
+        <h2>입력 항목</h2>
+        <button class="btn-secondary btn-sm hidden" id="addRowBtn">+ 항목 추가</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="placeholder-table">
+          <thead>
+            <tr>
+              <th class="col-tag">삽입자</th>
+              <th class="col-desc">설명</th>
+              <th class="col-type">유형</th>
+              <th class="col-value">입력값 / 수식</th>
+              <th class="col-note">비고 (한글금액)</th>
+              <th class="col-action hidden" id="actionsHeader">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="placeholderBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 문서 미리보기 -->
+    <section class="preview-section">
+      <div class="section-header">
+        <h2>문서 미리보기</h2>
+        <span class="preview-hint">빈 항목은 <span class="ph-empty-sample">[이름]</span> 으로 표시</span>
+      </div>
+
+      <div class="document-preview" id="documentPreview"></div>
+
+      <!-- 본문 편집 영역 (기본 숨김) -->
+      <div class="template-editor hidden" id="templateEditorDiv">
+        <div class="editor-toolbar">
+          <span class="editor-hint">&#128161; {1}, {2} 등 삽입자를 본문에 사용하세요</span>
+          <div class="editor-btns">
+            <button class="btn-primary btn-sm" id="saveBodyBtn">저장</button>
+            <button class="btn-secondary btn-sm" id="cancelBodyBtn">취소</button>
+          </div>
+        </div>
+        <textarea id="templateEditor" rows="20" placeholder="본문을 입력하세요..."></textarea>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== 하단 액션 버튼 ===== -->
+  <footer class="app-footer">
+    <div class="footer-actions">
+      <button class="btn-primary" onclick="copyDocument()">&#128203; 복사하기</button>
+      <button class="btn-kakao" onclick="shareKakao()">&#128172; 카카오톡 전송</button>
+      <button class="btn-secondary" onclick="printDocument()">&#128424; 인쇄하기</button>
+    </div>
+    <div class="footer-manage">
+      <button class="btn-secondary btn-sm" onclick="exportData()">&#128228; 내보내기</button>
+      <button class="btn-secondary btn-sm" onclick="importData()">&#128229; 가져오기</button>
+      <button class="btn-danger btn-sm" onclick="resetData()">&#8635; 초기화</button>
+      <input type="file" id="importFile" accept=".json" class="hidden" onchange="handleImport(event)">
+    </div>
+  </footer>
+
+  <!-- 토스트 알림 -->
+  <div class="toast hidden" id="toast"></div>
+
+  <!-- 동기화 상태 표시 -->
+  <div class="sync-badge hidden" id="syncBadge"></div>
+
+</div>
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- Firebase 설정 (이 파일에 config 붙여넣기) -->
+<script src="firebase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
