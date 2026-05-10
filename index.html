@@ -113,9 +113,11 @@
     <div class="section-header">
       <h2>삽입자 라이브러리</h2>
       <div class="library-header-btns">
+        <button class="btn-secondary btn-sm" id="libShowAllBtn" onclick="toggleLibShowAll()">전체 보기</button>
         <button class="btn-secondary btn-sm" onclick="selectAllLibrary(true)">전체 선택</button>
         <button class="btn-secondary btn-sm" onclick="selectAllLibrary(false)">전체 해제</button>
-        <button class="btn-primary btn-sm" onclick="addLibraryItems()">&#10133; 선택항목 현재 템플릿에 추가</button>
+        <button class="btn-primary btn-sm" onclick="addLibraryItems()">&#10133; 템플릿에 추가</button>
+        <button class="btn-danger btn-sm" onclick="deleteLibraryItems()">&#10134; 선택 삭제</button>
       </div>
     </div>
     <div class="table-wrapper">
@@ -126,11 +128,26 @@
             <th>분류</th>
             <th>설명</th>
             <th>유형</th>
-            <th>수식 (자동계산)</th>
+            <th>기본값 / 수식 &nbsp;<small style="font-weight:400;color:#9ca3af">(셀 클릭하여 직접 수정)</small></th>
           </tr>
         </thead>
         <tbody id="libraryBody"></tbody>
       </table>
+    </div>
+    <!-- 새 항목 추가 폼 -->
+    <div class="lib-add-form">
+      <span class="lib-add-title">+ 새 항목 추가</span>
+      <input  type="text" id="libNewCat"   placeholder="분류 (예: 특약-매매)" class="lib-input">
+      <input  type="text" id="libNewDesc"  placeholder="설명 *" class="lib-input lib-input-desc">
+      <select id="libNewType" class="select-type lib-input-type" onchange="document.getElementById('libExtraLabel').textContent=this.value==='formula'?'수식':'기본값'">
+        <option value="text">텍스트</option>
+        <option value="amount_man">금액(만)</option>
+        <option value="date">날짜</option>
+        <option value="formula">수식</option>
+      </select>
+      <input  type="text" id="libNewExtra" placeholder="기본값 또는 수식" class="lib-input lib-input-extra">
+      <select id="libNewGroupId" class="lib-input lib-input-groupid"><option value="">공통</option></select>
+      <button class="btn-primary btn-sm" onclick="addNewLibraryItem()">추가</button>
     </div>
   </section>
 

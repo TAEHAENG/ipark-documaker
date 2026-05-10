@@ -447,37 +447,105 @@ const DEFAULT_DATA = {
 };
 
 // ============================================================
-// 삽입자 라이브러리 (공통 샘플)
+// 삽입자 라이브러리 기본값 (DEFAULT_LIBRARY)
+// 사용자가 추가/삭제하면 appData.library 에 저장됨
 // ============================================================
 
-const PLACEHOLDER_LIBRARY = [
-  // 부동산
-  { category: '부동산',    description: '물건지 주소',                   type: 'text',       formulaTemplate: '' },
-  // 매매 금액
-  { category: '매매금액',  description: '매매대금(만단위)',               type: 'amount_man', formulaTemplate: '' },
-  { category: '매매금액',  description: '계약금(만단위)',                 type: 'amount_man', formulaTemplate: '' },
-  { category: '매매금액',  description: '중도금(만단위)',                 type: 'amount_man', formulaTemplate: '' },
-  { category: '매매금액',  description: '잔금 = 매매대금-계약금-중도금', type: 'formula',    formulaTemplate: '[매매대금(만단위)]-[계약금(만단위)]-[중도금(만단위)]' },
-  // 전세 금액
-  { category: '전세금액',  description: '전세보증금(만단위)',             type: 'amount_man', formulaTemplate: '' },
-  { category: '전세금액',  description: '잔금 = 전세보증금-계약금',      type: 'formula',    formulaTemplate: '[전세보증금(만단위)]-[계약금(만단위)]' },
-  // 월세 금액
-  { category: '월세금액',  description: '보증금(만단위)',                 type: 'amount_man', formulaTemplate: '' },
-  { category: '월세금액',  description: '월세(만단위)',                   type: 'amount_man', formulaTemplate: '' },
-  { category: '월세금액',  description: '잔금 = 보증금-계약금',          type: 'formula',    formulaTemplate: '[보증금(만단위)]-[계약금(만단위)]' },
-  // 날짜
-  { category: '날짜',      description: '계약금 입금일',                  type: 'text',       formulaTemplate: '' },
-  { category: '날짜',      description: '중도금일',                       type: 'text',       formulaTemplate: '' },
-  { category: '날짜',      description: '잔금일',                         type: 'text',       formulaTemplate: '' },
-  { category: '날짜',      description: '임대차 기간',                    type: 'text',       formulaTemplate: '' },
-  { category: '날짜',      description: '월세 납부일(일)',                type: 'text',       formulaTemplate: '' },
-  { category: '날짜',      description: '계약서 작성일',                  type: 'text',       formulaTemplate: '' },
-  { category: '날짜',      description: '안내일자',                       type: 'text',       formulaTemplate: '' },
-  // 기타
-  { category: '기타',      description: '특약사항',                       type: 'text',       formulaTemplate: '' },
-  { category: '임차인',    description: '임차인 성명',                    type: 'text',       formulaTemplate: '' },
-  { category: '임차인',    description: '세대 주소',                      type: 'text',       formulaTemplate: '' },
-  { category: '임차인',    description: '입주 예정일',                    type: 'text',       formulaTemplate: '' },
+const DEFAULT_LIBRARY = [
+  // ── 부동산 ─────────────────────────────────────────────
+  { category: '부동산',    description: '물건지 주소',                   type: 'text',       formulaTemplate: '', defaultValue: '' },
+  // ── 매매 금액 ──────────────────────────────────────────
+  { category: '매매금액',  description: '매매대금(만단위)',               type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '매매금액',  description: '계약금(만단위)',                 type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '매매금액',  description: '계약금 중 일부(만단위)',         type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '매매금액',  description: '중도금(만단위)',                 type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '매매금액',  description: '잔금 = 매매대금-계약금-중도금', type: 'formula',    formulaTemplate: '[매매대금(만단위)]-[계약금(만단위)]-[중도금(만단위)]', defaultValue: '' },
+  // ── 전세 금액 ──────────────────────────────────────────
+  { category: '전세금액',  description: '전세보증금(만단위)',             type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '전세금액',  description: '잔금 = 전세보증금-계약금',      type: 'formula',    formulaTemplate: '[전세보증금(만단위)]-[계약금(만단위)]', defaultValue: '' },
+  // ── 월세 금액 ──────────────────────────────────────────
+  { category: '월세금액',  description: '보증금(만단위)',                 type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '월세금액',  description: '월세(만단위)',                   type: 'amount_man', formulaTemplate: '', defaultValue: '' },
+  { category: '월세금액',  description: '잔금 = 보증금-계약금',          type: 'formula',    formulaTemplate: '[보증금(만단위)]-[계약금(만단위)]', defaultValue: '' },
+  // ── 날짜 ───────────────────────────────────────────────
+  { category: '날짜',      description: '계약금 입금일',                  type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '날짜',      description: '중도금일',                       type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '날짜',      description: '잔금일',                         type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '날짜',      description: '임대차 기간',                    type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '날짜',      description: '월세 납부일(일)',                type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '날짜',      description: '계약서 작성일',                  type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '날짜',      description: '안내일자',                       type: 'text',       formulaTemplate: '', defaultValue: '' },
+  // ── 임차인 ─────────────────────────────────────────────
+  { category: '임차인',    description: '임차인 성명',                    type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '임차인',    description: '세대 주소',                      type: 'text',       formulaTemplate: '', defaultValue: '' },
+  { category: '임차인',    description: '입주 예정일',                    type: 'text',       formulaTemplate: '', defaultValue: '' },
+  // ── 특약 (매매) ────────────────────────────────────────
+  { category: '특약-매매', description: '근저당 잔금 시 말소',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '등기사항전부증명서상의 ○○은행 채권최고금 ○○○,○○○,○○○원 근저당권은 잔금 수령 즉시 매도인이 전액 상환 말소키로 한다.' },
+  { category: '특약-매매', description: '전세 임차인 잔금 전 퇴거',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '현 임차인(전세)은 잔금일 이전까지 퇴거 완료하며, 미이행 시 매도인이 모든 책임을 진다.' },
+  { category: '특약-매매', description: '국세·지방세 완납 확인',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '매도인에게 국세 및 지방세 체납 사실이 없음을 확인 후 계약함.' },
+  { category: '특약-매매', description: '선순위 근저당 설정 금지',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '잔금일 당일 매수인은 선순위 근저당을 설정하지 않는다.' },
+  { category: '특약-매매', description: '잔금일 앞당기기 가능',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '잔금일은 쌍방 합의하에 앞으로만 당길 수 있다.' },
+  { category: '특약-매매', description: '공과금 잔금일 기준 정산',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '전기, 가스, 수도, 관리비 등 제반 공과금은 잔금일 기준으로 정산한다.' },
+  { category: '특약-매매', description: '붙박이·시스템에어컨 포함',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '계약 당시 설치된 붙박이장 및 시스템에어컨은 매매대금에 포함한다.' },
+  { category: '특약-매매', description: '배액배상 조항',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '매수인의 일방적 계약 파기 시 입금한 계약금 포기, 매도인의 일방적 계약 파기 시 계약금 배액 배상한다.' },
+  { category: '특약-매매', description: '하자 담보 책임',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '잔금 후 발생하는 은닉 하자에 대해 매도인이 3개월간 책임진다.' },
+  // ── 특약 (전세) ────────────────────────────────────────
+  { category: '특약-전세', description: '전입신고·확정일자 필수',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '임차인은 잔금 당일 전입신고 및 확정일자를 받기로 한다.' },
+  { category: '특약-전세', description: '전세보증보험 가입 협조',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '임대인은 임차인의 주택도시보증공사(HUG) 전세보증보험 가입에 적극 협조하며 관련 서류를 제공한다.' },
+  { category: '특약-전세', description: '장기수선충당금 임대인 부담',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '장기수선충당금은 임대인 부담으로 퇴거 시 정산하기로 한다.' },
+  { category: '특약-전세', description: '선순위 채권 없음 확인',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '등기사항전부증명서상 선순위 채권(근저당, 가압류 등)이 없음을 확인 후 계약한다.' },
+  { category: '특약-전세', description: '묵시적 갱신 조항',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '임대차 기간 만료 2개월 전까지 쌍방 별도 의사 표시 없으면 동일 조건으로 2년 자동 연장된다.' },
+  { category: '특약-전세', description: '임대인 근저당 추가 설정 금지',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '임대차 기간 중 임대인은 전세보증금 범위를 초과하는 근저당 등 담보권을 추가 설정하지 않는다.' },
+  // ── 특약 (월세) ────────────────────────────────────────
+  { category: '특약-월세', description: '월세 납부일 및 연체 이자',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '월세는 매월 ○일까지 납부하며, 3회 이상 연체 시 임대인은 계약을 해지할 수 있다.' },
+  { category: '특약-월세', description: '관리비 별도',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '관리비는 월세와 별도로 실비 정산한다.' },
+  // ── 공통 특약 ──────────────────────────────────────────
+  { category: '특약-공통', description: '중개보수 잔금 시 지급',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '중개보수는 잔금 수령 시 지불하기로 한다.' },
+  { category: '특약-공통', description: '계약서 작성일 별도 협의',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '정식 계약서 작성일은 추후 쌍방 합의하여 결정한다.' },
+  { category: '특약-공통', description: '현황 확인 후 계약',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '임차인(매수인)은 현장 현황을 직접 확인 후 계약하는 것으로 한다.' },
+  { category: '특약-공통', description: '특약사항 (직접 입력)',
+    type: 'text', formulaTemplate: '',
+    defaultValue: '' },
 ];
 
 function resolveFormulaTemplate(tmpl, allPhs) {
@@ -501,6 +569,8 @@ let bodyEditing       = false;
 
 // 드래그 상태
 let _dragSrcPos = null;
+// 라이브러리 전체 보기 토글
+let libShowAll = false;
 
 // ============================================================
 // Firebase 동기화
@@ -585,6 +655,7 @@ function setupRealtimeSync() {
       mergeNewDefaults();
       renderGroupSelector();
       renderAll();
+      renderLibrary();
       setSyncBadge('ok');
     }
   }, err => {
@@ -642,6 +713,13 @@ function mergeNewDefaults() {
   }
   for (const [id, tmpl] of Object.entries(DEFAULT_DATA.templates)) {
     if (!appData.templates[id]) appData.templates[id] = deepClone(tmpl);
+  }
+  // 라이브러리 초기화 (없으면 기본값 세팅) + groupId 마이그레이션
+  if (!appData.library) {
+    appData.library = deepClone(DEFAULT_LIBRARY);
+    appData.library.forEach(item => { item.groupId = null; });
+  } else {
+    appData.library.forEach(item => { if (!('groupId' in item)) item.groupId = null; });
   }
 }
 
@@ -711,7 +789,7 @@ function renderGroupSelector() {
   const sel = document.getElementById('groupSelect');
   sel.innerHTML = appData.groups.map(g =>
     `<option value="${esc(g.id)}">${esc(g.name)}</option>`
-  ).join('');
+  ).join('') + `<option value="__new__">＋ 신규 그룹 추가</option>`;
 
   if (!currentGroupId || !appData.groups.find(g => g.id === currentGroupId)) {
     currentGroupId = appData.groups[0]?.id || null;
@@ -728,12 +806,12 @@ function renderSubgroupSelector() {
 
   sel.innerHTML = group.subgroups.map(s =>
     `<option value="${esc(s.id)}">${esc(s.name)}</option>`
-  ).join('');
+  ).join('') + `<option value="__new__">＋ 신규 문서 추가</option>`;
 
   if (!currentSubgroupId || !group.subgroups.find(s => s.id === currentSubgroupId)) {
     currentSubgroupId = group.subgroups[0]?.id || null;
   }
-  sel.value = currentSubgroupId;
+  if (currentSubgroupId) sel.value = currentSubgroupId;
 
   const sub = group.subgroups.find(s => s.id === currentSubgroupId);
   currentTemplateId = sub?.templateId || null;
@@ -840,20 +918,71 @@ function renderAll() {
 // ============================================================
 
 function onGroupChange() {
-  currentGroupId    = document.getElementById('groupSelect').value;
+  const val = document.getElementById('groupSelect').value;
+  if (val === '__new__') {
+    const name = prompt('새 그룹 이름을 입력하세요 (예: 토지, 오피스텔):');
+    if (!name?.trim()) { document.getElementById('groupSelect').value = currentGroupId || ''; return; }
+    createNewGroup(name.trim());
+    return;
+  }
+  currentGroupId    = val;
   currentSubgroupId = null;
   cancelBodyEdit(false);
   renderSubgroupSelector();
   renderAll();
+  renderLibrary();
 }
 
 function onSubgroupChange() {
-  currentSubgroupId = document.getElementById('subgroupSelect').value;
+  const val = document.getElementById('subgroupSelect').value;
+  if (val === '__new__') {
+    const name = prompt('새 문서 이름을 입력하세요 (예: 분양권, 경매):');
+    if (!name?.trim()) { document.getElementById('subgroupSelect').value = currentSubgroupId || ''; return; }
+    createNewSubgroup(name.trim());
+    return;
+  }
+  currentSubgroupId = val;
   const group = appData.groups.find(g => g.id === currentGroupId);
-  const sub   = group?.subgroups.find(s => s.id === currentSubgroupId);
+  const sub   = group?.subgroups.find(s => s.id === val);
   currentTemplateId = sub?.templateId || null;
   cancelBodyEdit(false);
   renderAll();
+}
+
+function createNewGroup(name) {
+  const id         = 'g-' + Date.now();
+  const subId      = 's-' + Date.now();
+  const templateId = id + '-' + subId;
+
+  appData.groups.push({
+    id, name,
+    subgroups: [{ id: subId, name: '기본 문서', templateId }]
+  });
+  appData.templates[templateId] = { id: templateId, name: name + ' 기본 문서', placeholders: [], body: '' };
+
+  currentGroupId = id; currentSubgroupId = subId; currentTemplateId = templateId;
+  saveData();
+  renderGroupSelector();
+  renderAll();
+  renderLibrary();
+  showToast(`"${name}" 그룹이 추가되었습니다.`);
+}
+
+function createNewSubgroup(name) {
+  const group = appData.groups.find(g => g.id === currentGroupId);
+  if (!group) return;
+
+  const subId      = 's-' + Date.now();
+  const templateId = currentGroupId + '-' + subId;
+
+  group.subgroups.push({ id: subId, name, templateId });
+  appData.templates[templateId] = { id: templateId, name, placeholders: [], body: '' };
+
+  currentSubgroupId = subId; currentTemplateId = templateId;
+  saveData();
+  renderSubgroupSelector();
+  renderAll();
+  showToast(`"${name}" 문서가 추가되었습니다.`);
 }
 
 // ============================================================
@@ -1187,22 +1316,69 @@ function resetData() {
 
 function renderLibrary() {
   const tbody = document.getElementById('libraryBody');
-  if (!tbody) return;
+  if (!tbody || !appData) return;
+  const lib = appData.library || [];
   const typeLabel = { text: '텍스트', amount_man: '금액(만)', date: '날짜', formula: '수식' };
 
-  tbody.innerHTML = PLACEHOLDER_LIBRARY.map((item, i) => `
-    <tr>
+  // 전체 보기 토글 버튼 상태 갱신
+  const toggleBtn = document.getElementById('libShowAllBtn');
+  if (toggleBtn) {
+    toggleBtn.textContent = libShowAll ? '현재 그룹만' : '전체 보기';
+    toggleBtn.classList.toggle('active', libShowAll);
+  }
+
+  // 추가 폼의 그룹 셀렉트 갱신
+  const groupIdSel = document.getElementById('libNewGroupId');
+  if (groupIdSel) {
+    const prev = groupIdSel.value;
+    groupIdSel.innerHTML = `<option value="">공통 (전체 그룹)</option>` +
+      appData.groups.map(g =>
+        `<option value="${esc(g.id)}" ${g.id === currentGroupId ? 'selected' : ''}>${esc(g.name)}</option>`
+      ).join('');
+    if (prev && appData.groups.find(g => g.id === prev)) groupIdSel.value = prev;
+  }
+
+  // 필터: 현재 그룹 항목 + 공통 항목, 또는 전체 표시
+  const visible = lib.map((item, i) => ({ item, i })).filter(({ item }) =>
+    libShowAll || !item.groupId || item.groupId === currentGroupId
+  );
+
+  tbody.innerHTML = visible.map(({ item, i }) => `
+    <tr id="lib-row-${i}">
       <td class="col-check">
         <input type="checkbox" class="lib-check" data-lib="${i}"
                onchange="this.closest('tr').classList.toggle('lib-selected', this.checked)">
       </td>
-      <td><span class="lib-cat-badge">${esc(item.category)}</span></td>
-      <td>${esc(item.description)}</td>
-      <td><span class="type-badge type-${item.type}">${typeLabel[item.type]}</span></td>
-      <td>${item.formulaTemplate
-            ? `<span class="lib-formula-hint">${esc(item.formulaTemplate)}</span>`
-            : '<span style="color:#d1d5db">—</span>'}</td>
+      <td>
+        <span class="lib-cat-badge lib-cat-edit" contenteditable="true"
+              onblur="updateLibItem(${i},'category',this.innerText.trim())">${esc(item.category)}</span>
+      </td>
+      <td>
+        <span contenteditable="true" class="lib-desc-edit"
+              onblur="updateLibItem(${i},'description',this.innerText.trim())">${esc(item.description)}</span>
+      </td>
+      <td>
+        <select class="select-type lib-type-sel" onchange="updateLibItem(${i},'type',this.value)">
+          ${['text','amount_man','date','formula'].map(v =>
+            `<option value="${v}" ${item.type===v?'selected':''}>${typeLabel[v]}</option>`).join('')}
+        </select>
+      </td>
+      <td>
+        ${item.type === 'formula'
+          ? `<span contenteditable="true" class="lib-formula-hint"
+                   onblur="updateLibItem(${i},'formulaTemplate',this.innerText.trim())">${esc(item.formulaTemplate||'')}</span>`
+          : `<span contenteditable="true" class="lib-default-edit"
+                   onblur="updateLibItem(${i},'defaultValue',this.innerText.trim())"
+                   title="기본값 (템플릿에 추가될 때 미리 채워지는 내용)">${esc(item.defaultValue||'')}</span>`
+        }
+      </td>
     </tr>`).join('');
+}
+
+function updateLibItem(index, field, value) {
+  if (!appData.library[index]) return;
+  appData.library[index][field] = value;
+  saveData();
 }
 
 function selectAllLibrary(checked) {
@@ -1212,6 +1388,49 @@ function selectAllLibrary(checked) {
   });
 }
 
+function deleteLibraryItems() {
+  const checked = Array.from(document.querySelectorAll('.lib-check:checked'));
+  if (checked.length === 0) { showToast('삭제할 항목을 선택하세요.', 2000, 'error'); return; }
+  if (!confirm(`선택한 ${checked.length}개 항목을 라이브러리에서 삭제하시겠습니까?`)) return;
+
+  const indices = new Set(checked.map(cb => parseInt(cb.dataset.lib, 10)));
+  appData.library = appData.library.filter((_, i) => !indices.has(i));
+  saveData();
+  renderLibrary();
+  showToast(`${checked.length}개 항목이 삭제되었습니다.`);
+}
+
+function addNewLibraryItem() {
+  const cat     = document.getElementById('libNewCat').value.trim();
+  const desc    = document.getElementById('libNewDesc').value.trim();
+  const type    = document.getElementById('libNewType').value;
+  const extra   = document.getElementById('libNewExtra').value.trim();
+  const groupId = document.getElementById('libNewGroupId')?.value || null;
+
+  if (!desc) { showToast('설명을 입력하세요.', 2000, 'error'); return; }
+
+  appData.library.push({
+    category: cat || '기타',
+    description: desc,
+    type,
+    formulaTemplate: type === 'formula' ? extra : '',
+    defaultValue:    type !== 'formula' ? extra : '',
+    groupId: groupId || null
+  });
+
+  saveData();
+  renderLibrary();
+
+  ['libNewCat','libNewDesc','libNewExtra'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('libNewType').value = 'text';
+  showToast('라이브러리에 추가되었습니다.');
+}
+
+function toggleLibShowAll() {
+  libShowAll = !libShowAll;
+  renderLibrary();
+}
+
 function addLibraryItems() {
   const tmpl = getCurrentTemplate();
   if (!tmpl) { showToast('먼저 템플릿을 선택하세요.', 2000, 'error'); return; }
@@ -1219,19 +1438,19 @@ function addLibraryItems() {
   const checked = Array.from(document.querySelectorAll('.lib-check:checked'));
   if (checked.length === 0) { showToast('추가할 항목을 선택하세요.', 2000, 'error'); return; }
 
-  const selected = checked.map(cb => PLACEHOLDER_LIBRARY[parseInt(cb.dataset.lib, 10)]);
+  const selected = checked.map(cb => appData.library[parseInt(cb.dataset.lib, 10)]);
   const maxIdx   = Math.max(0, ...tmpl.placeholders.map(p => p.index));
 
-  // 1차: 인덱스 먼저 할당
+  // 1차: 인덱스 먼저 할당 + 기본값 세팅
   const newPhs = selected.map((item, i) => ({
     index: maxIdx + i + 1,
     description: item.description,
     type: item.type,
-    value: '',
+    value: item.defaultValue || '',
     formulaExpr: ''
   }));
 
-  // 2차: 수식 템플릿 해석 (기존 + 새 삽입자 통합해서 참조)
+  // 2차: 수식 템플릿 해석
   const allPhs = [...tmpl.placeholders, ...newPhs];
   newPhs.forEach((ph, i) => {
     if (selected[i].formulaTemplate) {
@@ -1240,8 +1459,6 @@ function addLibraryItems() {
   });
 
   tmpl.placeholders.push(...newPhs);
-
-  // 선택 해제
   selectAllLibrary(false);
 
   saveData();

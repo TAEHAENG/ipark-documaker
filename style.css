@@ -385,6 +385,7 @@ button { cursor: pointer; font-family: var(--font); border: none; transition: al
   border: 1px solid var(--border);
 }
 .btn-secondary:hover { background: #f9fafb; }
+.btn-secondary.active { background: #eff6ff; color: var(--primary); border-color: #bfdbfe; }
 
 .btn-danger {
   background: #fff;
@@ -564,7 +565,56 @@ tr.dragging  { opacity: .4; }
   background: #fdf4ff;
   padding: 2px 5px;
   border-radius: 3px;
+  display: inline-block;
+  min-width: 60px;
+  outline: none;
 }
+
+/* 인라인 편집 가능 셀 */
+[contenteditable="true"] {
+  border-radius: 3px;
+  padding: 1px 3px;
+  outline: none;
+  min-width: 20px;
+  display: inline-block;
+}
+[contenteditable="true"]:hover  { background: #f3f4f6; }
+[contenteditable="true"]:focus  { background: #eff6ff; box-shadow: 0 0 0 2px rgba(26,86,219,.2); }
+
+.lib-cat-edit  { cursor: text; }
+.lib-desc-edit { cursor: text; min-width: 80px; }
+.lib-default-edit {
+  color: #374151;
+  font-size: 12px;
+  max-width: 300px;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+/* 새 항목 추가 폼 */
+.lib-add-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-light);
+  background: #f9fafb;
+  flex-wrap: wrap;
+}
+.lib-add-title { font-size: 12px; font-weight: 600; color: var(--text-sub); white-space: nowrap; }
+.lib-input {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  outline: none;
+}
+.lib-input:focus { border-color: var(--primary); }
+.lib-input-desc    { flex: 1; min-width: 120px; }
+.lib-input-type    { min-width: 90px; }
+.lib-input-extra   { flex: 2; min-width: 160px; }
+.lib-input-groupid { min-width: 100px; }
 
 /* ===== 인쇄 ===== */
 
