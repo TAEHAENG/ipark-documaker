@@ -684,6 +684,16 @@ tr.dragging  { opacity: .4; }
   .placeholder-table th,
   .placeholder-table td { padding: 5px 6px; font-size: 12px; }
 
-  .col-desc { width: 90px; }
-  .col-type { width: 60px; }
+  /* 모바일: 드래그(1) · 유형(4) · 비고(6) 열 숨기기 → 설명·입력값 항상 표시 */
+  .placeholder-table th:nth-child(1),
+  .placeholder-table td:nth-child(1) { display: none; } /* 드래그 */
+
+  .placeholder-table th:nth-child(4),
+  .placeholder-table td:nth-child(4) { display: none; } /* 유형 */
+
+  .placeholder-table th:nth-child(6),
+  .placeholder-table td:nth-child(6) { display: none; } /* 비고 */
+
+  .col-desc  { width: auto; }
+  .col-value { min-width: 120px; }
 }
