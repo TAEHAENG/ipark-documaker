@@ -583,6 +583,7 @@ const FB_DOC        = 'data';
 let _db              = null;   // Firestore 인스턴스
 let _fbReady         = false;  // Firebase 연결 완료 여부
 let _localSave       = false;  // 내가 저장 중인 경우 onSnapshot 무시용
+let _cloudSynced     = false;  // 클라우드 데이터를 한 번이라도 받았는지 (못 받았으면 업로드 금지)
 
 function isFirebaseConfigured() {
   // firebase-config.js 의 값이 플레이스홀더가 아닌지 확인
@@ -599,6 +600,8 @@ function initFirebase() {
     _fbReady = true;
   } catch (e) {
     console.warn('Firebase 초기화 실패:', e);
+    setSyncBadge('offline');
+    showToast('⚠ 동기화 모듈을 불러오지 못했습니다 (네트워크/보안 프로그램 차단 가능). 이 기기 데이터만 표시됩니다.', 8000, 'error');
   }
 }
 
@@ -616,7 +619,9 @@ function setSyncBadge(state) {
 async function loadDataFromFirebase() {
   if (!_fbReady) return false;
   try {
-    const snap = await _db.collection(FB_COLLECTION).doc(FB_DOC).get();
+    // 캐시가 아닌 서버에서 직접 읽어 연결 여부를 확실히 판단
+    const snap = await _db.collection(FB_COLLECTION).doc(FB_DOC).get({ source: 'server' });
+    _cloudSynced = true; // 서버 응답을 받음 (문서가 없어도 업로드 허용)
     if (snap.exists && snap.data().appData) {
       appData = snap.data().appData;
       mergeNewDefaults();
@@ -626,12 +631,15 @@ async function loadDataFromFirebase() {
   } catch (e) {
     console.warn('Firebase 읽기 실패:', e);
     setSyncBadge('offline');
+    showToast('⚠ 서버 연결 실패 — 이 기기에 저장된 내용만 표시됩니다. 편집 내용은 다른 기기에 공유되지 않습니다.', 8000, 'error');
   }
   return false;
 }
 
 async function saveDataToFirebase() {
   if (!_fbReady) return;
+  // 서버 데이터를 못 받은 상태에서 올리면 클라우드 내용을 기본값으로 덮어쓰게 됨
+  if (!_cloudSynced) { setSyncBadge('offline'); return; }
   _localSave = true;
   setSyncBadge('saving');
   try {
@@ -650,6 +658,8 @@ function setupRealtimeSync() {
   if (!_fbReady) return;
   _db.collection(FB_COLLECTION).doc(FB_DOC).onSnapshot(snap => {
     if (_localSave) return; // 내가 저장한 변경은 무시
+    if (snap.metadata.fromCache) return; // 서버 확인 전 캐시 데이터는 무시
+    _cloudSynced = true;
     if (snap.exists && snap.data().appData) {
       appData = snap.data().appData;
       mergeNewDefaults();
@@ -674,7 +684,7 @@ async function loadData() {
     initFirebase();
     const loaded = await loadDataFromFirebase();
     if (loaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); // 오프라인 캐시
+      cacheLocally(); // 오프라인 캐시
       return;
     }
   }
@@ -693,9 +703,24 @@ async function loadData() {
 
 function saveData() {
   // localStorage에 항상 저장 (오프라인 대비)
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); } catch { /* full */ }
+  cacheLocally();
   // Firebase에도 저장 (비동기, 실패해도 무시)
   saveDataToFirebase();
+}
+
+function cacheLocally() {
+  // 브라우저 저장공간이 가득 차도(QuotaExceededError) 앱이 멈추지 않게 함
+  const json = JSON.stringify(appData);
+  try {
+    localStorage.setItem(STORAGE_KEY, json);
+  } catch (e) {
+    try {
+      localStorage.removeItem(STORAGE_KEY); // 예전 캐시를 지우고 한 번 더 시도
+      localStorage.setItem(STORAGE_KEY, json);
+    } catch {
+      console.warn('로컬 캐시 저장 실패 (저장공간 부족):', e);
+    }
+  }
 }
 
 function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
