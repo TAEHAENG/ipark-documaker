@@ -186,7 +186,7 @@ body {
 .col-tag   { width: 52px; }
 .col-desc  { width: 130px; }
 .col-type  { width: 80px; }
-.col-value { min-width: 130px; }
+.col-value { min-width: 220px; }
 .col-note  { min-width: 120px; }
 .col-action{ width: 36px; text-align: center; }
 
@@ -271,6 +271,16 @@ textarea {
 .input-formula:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(26,86,219,.15); }
 
 .input-value[type="number"] { text-align: right; }
+
+/* 텍스트 입력: 긴 내용은 줄바꿈하고 높이 자동 조절 */
+.input-wrap {
+  display: block;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
 
 .select-type {
   width: 100%;

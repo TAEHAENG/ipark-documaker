@@ -859,6 +859,10 @@ function renderTable() {
         ? `<input type="text" class="input-formula" value="${esc(ph.formulaExpr)}"
              placeholder="{1}+{2}" onchange="updateFormulaExpr(${ph.index}, this.value)">`
         : `<span class="formula-display">${esc(ph.formulaExpr) || '(수식 없음)'}</span>`;
+    } else if (ph.type === 'text') {
+      // 긴 주소 등이 잘려 보이지 않도록 줄바꿈 + 높이 자동 조절
+      inputCell = `<textarea class="input-value input-wrap" rows="1"
+        oninput="autoGrow(this); updateValue(${ph.index}, this.value)">${esc(ph.value)}</textarea>`;
     } else {
       const itype = ph.type === 'amount_man' ? 'number' : 'text';
       const extra = ph.type === 'amount_man' ? 'step="any" min="0"' : '';
@@ -903,8 +907,14 @@ function renderTable() {
   }).join('');
 
   document.getElementById('placeholderBody').innerHTML = rows;
+  document.querySelectorAll('#placeholderBody .input-wrap').forEach(autoGrow);
   document.getElementById('actionsHeader').classList.toggle('hidden', !editMode);
   document.getElementById('addRowBtn').classList.toggle('hidden', !editMode);
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 2 + 'px'; // +2: 테두리
 }
 
 function renderPreview() {
@@ -1517,6 +1527,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('cancelBodyBtn').addEventListener('click', () => cancelBodyEdit(true));
   document.getElementById('addRowBtn')    .addEventListener('click', addPlaceholder);
   document.getElementById('templateEditor').addEventListener('input', onTemplateEditorInput);
+  window.addEventListener('resize', () => document.querySelectorAll('#placeholderBody .input-wrap').forEach(autoGrow));
 
   // 데이터 로드 (Firebase or localStorage)
   await loadData();
